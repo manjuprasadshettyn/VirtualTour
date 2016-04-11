@@ -1,247 +1,85 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<title>Virtual Tour of NMAMIT</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link rel="stylesheet" href="style.css">
-	<script src="js/three.min.js"></script>
-	<script src="js/renderers/CSS3DRenderer.js"></script>
-	<script>
-	function keyListener() {
-		document.onkeydown = function (e) {
-    	e = e || window.event;
-	    //alert(e.keyCode);
-		if(e.keyCode==37)
-			moveLeft();
-		else if(e.keyCode==39)
-			moveRight();
+<html lang="en">
+    <head>
+        <title>VIRTUAL TOUR OF NMAMIT NITTE</title>
+        <link rel="stylesheet" type="text/css" href="css/style2.css" />
+		<link href='http://fonts.googleapis.com/css?family=Raleway:300,500|Arvo:700' rel='stylesheet' type='text/css'>
+		<script type="text/javascript" src="js/modernizr.custom.79639.js"></script>
+    </head>
+    <body>
+        <div class="container">
 
-		if(e.keyCode==38)
-			zoomIn();
-		else if(e.keyCode==40)
-			zoomOut();
-		};
-	}
-	</script>
-</head>
-<body onload="keyListener()">
-	<div class="social-icons">
-		<img src="img/zoomin.png" alt="" onclick="zoomIn();"/>
-		<img src="img/zoomout.png" alt="" onclick="zoomOut();"/>
-		<img src="img/left.png" alt="" onclick="moveLeft();"/>
-		<img src="img/next.png" alt="" onclick="moveRight();"/>
-	</div>
+			<!-- Codrops top bar -->
+            <div class="codrops-top">
 
+            </div><!--/ Codrops top bar -->
 
+			<header>
 
-	<script>
+				<h1>VIRTUAL TOUR OF NMAMIT NITTE</h1>
+				<h2>
+					A Virtual tour showing some important places of the college using webgl and three.js technology
+					<span class="demo-note">Your current viewport size shows the simplified version</span>
+				</h2>
 
-	var camera, scene, renderer;
-	var geometry, material, mesh;
-	var target = new THREE.Vector3();
+				<div class="support-note"><!-- let's check browser support with modernizr -->
+					<span class="no-cssanimations">CSS animations are not supported in your browser</span>
+					<span class="no-csstransforms">CSS transforms are not supported in your browser</span>
+					<span class="no-csstransforms3d">CSS 3D transforms are not supported in your browser</span>
+					<span class="no-csstransitions">CSS transitions are not supported in your browser</span>
+					<span class="note-ie">Sorry, only modern browsers.</span>
+				</div>
 
-	var lon = 90, lat = 0;
-	var phi = 0, theta = 0;
+			</header>
 
-	var touchX, touchY;
-	var moveThis=0;
-	var moveLeftf=0;
-	var moveRightf=0;
-	var zoominf=0;
-	var zoomoutf=0;
-	init();
-	animate();
+			<section class="main">
 
-	function init() {
+				<div id="rm-container" class="rm-container">
 
-		camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+					<div class="rm-wrapper">
 
-		scene = new THREE.Scene();
+						<div class="rm-cover">
 
-		var sides = [
-			{
-				url: 'img/clg/posx.jpg',
-				position: [ -512, 0, 0 ],
-				rotation: [ 0, Math.PI / 2, 0 ]
-			},
-			{
-				url: 'img/clg/negx.jpg',
-				position: [ 512, 0, 0 ],
-				rotation: [ 0, -Math.PI / 2, 0 ]
-			},
-			{
-				url: 'img/clg/posy.jpg',
-				position: [ 0,  512, 0 ],
-				rotation: [ Math.PI / 2, 0, Math.PI ]
-			},
-			{
-				url: 'img/clg/negy.jpg',
-				position: [ 0, -512, 0 ],
-				rotation: [ - Math.PI / 2, 0, Math.PI ]
-			},
-			{
-				url: 'img/clg/posz.jpg',
-				position: [ 0, 0,  512 ],
-				rotation: [ 0, Math.PI, 0 ]
-			},
-			{
-				url: 'img/clg/negz.jpg',
-				position: [ 0, 0, -512 ],
-				rotation: [ 0, 0, 0 ]
-			}
-		];
+							<div class="rm-front">
+								<div class="rm-content">
 
-		for ( var i = 0; i < sides.length; i ++ ) {
+									<div class="rm-logo"></div>
+									<h2>COMPUTER GRAPHICS PROJECT</h2>
+									<h3>Virtual Tour using Webgl and three.js</h3>
 
-			var side = sides[ i ];
+									<div class="rm-info">
+										<p>
+										<strong><b>Submitted By: </strong><br>
+										Manjuprasad Shetty N (4nm13cs086)<br>
+										Vishwasa Navada K (4nm13cs196)<br><br>
+										<strong><b>Submitted To :</strong><br>
+										 Mr Pawan Hegde<br>
+									</div>
+                                    <a href="Main.html">View the Project</a>
 
-			var element = document.createElement( 'img' );
-			element.width = 1026; // 2 pixels extra to close the gap.
-			element.src = side.url;
-
-			var object = new THREE.CSS3DObject( element );
-			object.position.fromArray( side.position );
-			object.rotation.fromArray( side.rotation );
-			scene.add( object );
-
-		}
+								</div><!-- /rm-content -->
+							</div><!-- /rm-front -->
 
 
-		renderer = new THREE.CSS3DRenderer();
-		renderer.setSize( window.innerWidth, window.innerHeight );
-		document.body.appendChild( renderer.domElement );
 
-		//
+						</div><!-- /rm-cover -->
 
-		document.addEventListener( 'mousedown', onDocumentMouseDown, true );
-		document.addEventListener( 'mousewheel', onDocumentMouseWheel, true );
+					</div><!-- /rm-wrapper -->
 
-		document.addEventListener( 'touchstart', onDocumentTouchStart, true );
-		document.addEventListener( 'touchmove', onDocumentTouchMove, true );
+				</div><!-- /rm-container -->
 
-		window.addEventListener( 'resize', onWindowResize, true );
+			</section>
 
-	}
+        </div>
+		<!-- jQuery if needed -->
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <script type="text/javascript" src="js/menu.js"></script>
+		<script type="text/javascript">
+			$(function() {
 
-	function onWindowResize() {
+				Menu.init();
 
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
-
-		renderer.setSize( window.innerWidth, window.innerHeight );
-
-	}
-
-	function onDocumentMouseDown( event ) {
-
-		event.preventDefault();
-		moveThis=1;
-		document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-		document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-
-	}
-
-	function onDocumentMouseMove( event ) {
-
-		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-
-		lon -= movementX * 0.1;
-		lat += movementY * 0.1;
-
-	}
-
-	function onDocumentMouseUp( event ) {
-		moveThis=0;
-		document.removeEventListener( 'mousemove', onDocumentMouseMove );
-		document.removeEventListener( 'mouseup', onDocumentMouseUp );
-
-	}
-
-	function onDocumentMouseWheel( event ) {
-
-		camera.fov -= event.wheelDeltaY * 0.05;
-		camera.updateProjectionMatrix();
-
-	}
-
-	function onDocumentTouchStart( event ) {
-
-		event.preventDefault();
-
-		var touch = event.touches[ 0 ];
-
-		touchX = touch.screenX;
-		touchY = touch.screenY;
-
-	}
-
-	function onDocumentTouchMove( event ) {
-
-		event.preventDefault();
-
-		var touch = event.touches[ 0 ];
-
-		lon -= ( touch.screenX - touchX ) * 0.1;
-		lat += ( touch.screenY - touchY ) * 0.1;
-
-		touchX = touch.screenX;
-		touchY = touch.screenY;
-
-	}
-
-	function animate() {
-
-		requestAnimationFrame( animate );
-
-		lon +=  0.1;
-		lat = Math.max( - 85, Math.min( 85, lat ) );
-		phi = THREE.Math.degToRad( 90 - lat );
-		theta = THREE.Math.degToRad( lon );
-		if(moveThis){
-			target.x = Math.sin( phi ) * Math.cos( theta );
-			target.y = Math.cos( phi );
-			target.z = Math.sin( phi ) * Math.sin( theta );
-		}
-		if(moveLeftf){
-			target.x = Math.sin( -phi ) * Math.cos( theta );
-			
-		}
-		if(moveRightf){
-			target.x = Math.sin( phi ) * Math.cos( theta );
-			target.y = Math.cos( phi );
-			target.z = Math.sin( phi ) * Math.sin( theta );
-		}
-		if(zoominf){
-			camera.fov -= 10 ;
-			camera.updateProjectionMatrix();
-			zoominf=0;
-		}
-		if(zoomoutf){
-			camera.fov += 10 ;
-			camera.updateProjectionMatrix();
-			zoomoutf=0;
-		}
-		camera.lookAt( target );
-
-		renderer.render( scene, camera );
-
-	}
-	function moveLeft() {
-		moveLeftf=1;
-		moveRightf=0;
-	}
-	function moveRight() {
-		moveRightf=1;
-		moveLeftf=0;
-	}
-	function zoomIn() {
-		zoominf=1;
-	}
-	function zoomOut() {
-		zoomoutf=1;
-	}
-	</script>
-</body>
+			});
+		</script>
+    </body>
 </html>
