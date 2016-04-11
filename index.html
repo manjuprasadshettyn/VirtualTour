@@ -1,0 +1,314 @@
+	<!DOCTYPE html>
+<html>
+	<head>
+		<title>Virtual Tour of NMAMIT</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0;
+				cursor: move;
+				overflow: hidden;
+			}
+
+			a {
+				color: #ffffff;
+			}
+
+			#info {
+				position: absolute;
+				width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				font-weight: bold;
+				text-align: center;
+				z-index: 1;
+			}
+.social-icons{
+	margin:0 auto;
+	color:#fff;
+	width:100%;
+	height:auto;
+	background-color: rgba(216, 201, 201, 0.46);
+	text-align: center;
+	position: absolute;
+	bottom:0;
+	z-index: 556455;
+}
+.social-icons img{
+	width:35px;
+	height:35px;
+	margin:10px;
+	float:none;
+	display: inline-block;
+	cursor: pointer;
+}
+		</style>
+	</head>
+	<body>
+		<div class="social-icons">
+			<img src="img/zoomin.png" alt="" onclick="zommIn();"/>
+			<img src="img/zoomout.png" alt="" onclick="zoomOut();"/>
+			<img src="img/left.png" alt="" onclick="moveLeft();"/>
+			<img src="img/next.png" alt="" onclick="moveRight();"/>
+		</div>
+		<script src="js/three.min.js"></script>
+		<script src="js/renderers/CSS3DRenderer.js"></script>
+
+
+
+		<script>
+
+			var camera, scene, renderer;
+			var geometry, material, mesh;
+			var target = new THREE.Vector3();
+
+			var lon = 90, lat = 0;
+			var phi = 0, theta = 0;
+
+			var touchX, touchY;
+			var moveThis=0;
+			var moveLeftf=0;
+			var moveRightf=0;
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+
+				scene = new THREE.Scene();
+
+				var sides = [
+					{
+						url: 'img/clg/posx.jpg',
+						position: [ -512, 0, 0 ],
+						rotation: [ 0, Math.PI / 2, 0 ]
+					},
+					{
+						url: 'img/clg/negx.jpg',
+						position: [ 512, 0, 0 ],
+						rotation: [ 0, -Math.PI / 2, 0 ]
+					},
+					{
+						url: 'img/clg/posy.jpg',
+						position: [ 0,  512, 0 ],
+						rotation: [ Math.PI / 2, 0, Math.PI ]
+					},
+					{
+						url: 'img/clg/negy.jpg',
+						position: [ 0, -512, 0 ],
+						rotation: [ - Math.PI / 2, 0, Math.PI ]
+					},
+					{
+						url: 'img/clg/posz.jpg',
+						position: [ 0, 0,  512 ],
+						rotation: [ 0, Math.PI, 0 ]
+					},
+					{
+						url: 'img/clg/negz.jpg',
+						position: [ 0, 0, -512 ],
+						rotation: [ 0, 0, 0 ]
+					}
+				];
+
+				for ( var i = 0; i < sides.length; i ++ ) {
+
+					var side = sides[ i ];
+
+					var element = document.createElement( 'img' );
+					element.width = 1026; // 2 pixels extra to close the gap.
+					element.src = side.url;
+
+					var object = new THREE.CSS3DObject( element );
+					object.position.fromArray( side.position );
+					object.rotation.fromArray( side.rotation );
+					scene.add( object );
+
+				}
+
+		// 		var spritey = makeTextSprite( " Hello, ",
+		// 	{ fontsize: 24, borderColor: {r:255, g:0, b:0, a:1.0}, backgroundColor: {r:255, g:100, b:100, a:0.8} } );
+		// spritey.position.set(-85,105,55);
+		// scene.add( spritey );
+		// var spritey = makeTextSprite( " World! ",
+		// 	{ fontsize: 32, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0} } );
+		// spritey.position.set(55,105,55);
+		// scene.add( spritey );
+
+				renderer = new THREE.CSS3DRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				document.addEventListener( 'mousedown', onDocumentMouseDown, true );
+				document.addEventListener( 'mousewheel', onDocumentMouseWheel, true );
+
+				document.addEventListener( 'touchstart', onDocumentTouchStart, true );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, true );
+
+				window.addEventListener( 'resize', onWindowResize, true );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseDown( event ) {
+
+				event.preventDefault();
+				moveThis=1;
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+				var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+				lon -= movementX * 0.1;
+				lat += movementY * 0.1;
+
+			}
+
+			function onDocumentMouseUp( event ) {
+				moveThis=0;
+				document.removeEventListener( 'mousemove', onDocumentMouseMove );
+				document.removeEventListener( 'mouseup', onDocumentMouseUp );
+
+			}
+
+			function onDocumentMouseWheel( event ) {
+
+				camera.fov -= event.wheelDeltaY * 0.05;
+				camera.updateProjectionMatrix();
+
+			}
+
+			function onDocumentTouchStart( event ) {
+
+				event.preventDefault();
+
+				var touch = event.touches[ 0 ];
+
+				touchX = touch.screenX;
+				touchY = touch.screenY;
+
+			}
+
+			function onDocumentTouchMove( event ) {
+
+				event.preventDefault();
+
+				var touch = event.touches[ 0 ];
+
+				lon -= ( touch.screenX - touchX ) * 0.1;
+				lat += ( touch.screenY - touchY ) * 0.1;
+
+				touchX = touch.screenX;
+				touchY = touch.screenY;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				lon +=  0.1;
+				lat = Math.max( - 85, Math.min( 85, lat ) );
+				phi = THREE.Math.degToRad( 90 - lat );
+				theta = THREE.Math.degToRad( lon );
+				if(moveThis){
+				target.x = Math.sin( phi ) * Math.cos( theta );
+				target.y = Math.cos( phi );
+				target.z = Math.sin( phi ) * Math.sin( theta );
+}
+if(moveLeftf){
+	target.x = Math.sin( -phi ) * Math.cos( theta );
+}
+if(moveRightf){
+	target.x = Math.sin( phi ) * Math.cos( theta );
+}
+				camera.lookAt( target );
+
+				renderer.render( scene, camera );
+
+			}
+			function moveLeft() {
+				moveLeftf=1;
+				moveRightf=0;
+
+			}
+			function moveRight() {
+				moveRightf=1;
+				moveLeftf=0;
+
+
+			}
+			// function makeTextSprite( message, parameters )
+			// {
+			// 	if ( parameters === undefined ) parameters = {};
+			//
+			// 	var fontface = parameters.hasOwnProperty("fontface") ?
+			// 		parameters["fontface"] : "Arial";
+			//
+			// 	var fontsize = parameters.hasOwnProperty("fontsize") ?
+			// 		parameters["fontsize"] : 18;
+			//
+			// 	var borderThickness = parameters.hasOwnProperty("borderThickness") ?
+			// 		parameters["borderThickness"] : 4;
+			//
+			// 	var borderColor = parameters.hasOwnProperty("borderColor") ?
+			// 		parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
+			//
+			// 	var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?
+			// 		parameters["backgroundColor"] : { r:255, g:255, b:255, a:1.0 };
+			// 	//var spriteAlignment = THREE.SpriteAlignment.topLeft;
+			//
+			// 	var canvas = document.createElement('canvas');
+			// 	var context = canvas.getContext('2d');
+			// 	context.font = "Bold " + fontsize + "px " + fontface;
+			//
+			// 	// get size data (height depends only on font size)
+			// 	var metrics = context.measureText( message );
+			// 	var textWidth = metrics.width;
+			//
+			// 	// // background color
+			// 	// context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + ","
+			// 	// 							  + backgroundColor.b + "," + backgroundColor.a + ")";
+			// 	// // border color
+			// 	// context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + ","
+			// 	// 							  + borderColor.b + "," + borderColor.a + ")";
+			// 	// context.lineWidth = borderThickness;
+			// 	// roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness, fontsize * 1.4 + borderThickness, 6);
+			// 	// // 1.4 is extra height factor for text below baseline: g,j,p,q.
+			// 	//
+			// 	// // text color
+			// 	context.fillStyle = "rgba(0, 0, 0, 1.0)";
+			// 	context.fillText( message, borderThickness, fontsize + borderThickness);
+			//
+			// 	// canvas contents will be used for a texture
+			// 	var texture = new THREE.Texture(canvas)
+			// 	texture.needsUpdate = true;
+			// 	var spriteMaterial = new THREE.SpriteMaterial(
+			// 		{ map: texture, useScreenCoordinates: false, alignment: spriteAlignment } );
+			// 	var sprite = new THREE.Sprite( spriteMaterial );
+			// 	sprite.scale.set(100,50,1.0);
+			// 	return sprite;
+			// }
+
+		</script>
+	</body>
+</html>
