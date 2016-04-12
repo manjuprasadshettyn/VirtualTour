@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Virtual Tour of NMAMIT</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<script src="js/three.min.js"></script>
+	<script src="js/renderers/CSS3DRenderer.js"></script>
+	<script>
+	function keyListener() {
+		document.onkeydown = function (e) {
+    	e = e || window.event;
+
+		if(e.keyCode==37)
+			moveLeft();
+		else if(e.keyCode==39)
+			moveRight();
+
+		if(e.keyCode==38)
+			zoomIn();
+		else if(e.keyCode==40)
+			zoomOut();
+		};
+	}
+	</script>
+</head>
+<body onload="keyListener()">
+
+	  <div class="social-icons">
+			<a href="#" title="Menu" data-toggle="popover" data-placement="top" data-content="<p><a href='Main.html'>Entrance</a><br/><a href='pld.html'>Placement Dept.</a><br/><a href='cs.html'>CS Dept.</a><br/><a href='is.html'>IS Dept.</a><br/><a href='bt.html'>BT Dept.</a><br/><a href='MCA.html'>MCA Dept.</a><br/><a href='Academics.html'>Academics Floor</a><br/><a href='acb.html'>Academics Back View</a><br/><a href='bm.html'>Basement</a><br/><a href='can.html'>Canteen</a><br/><a href='cb.html'>College Back View</a><br/><a href='Library.html'>Central Library</a><br/><a href='nm.html'>New Mech Block</a><br/><a href='ThirdFloor.html'>Third Floor</a><br/><a href='san.html'>Sanmathi Garden</a><br/><a href='SideView.html'>College Side View</a><br/><p/>">
+		  <img src="img/options.png" title="Open Menu" id="menu-toggle"/></a>
+  		<img src="img/zoomin.png" title="" onclick="zoomIn();"/>
+  		<img src="img/zoomout.png" title="" onclick="zoomOut();"/>
+  		<img src="img/left.png" title="" onclick="moveLeft();"/>
+  		<img src="img/next.png" title="" onclick="moveRight();"/>
+  	</div>
+
+
+
+
+	<script>
+
+	var camera, scene, renderer;
+	var geometry, material, mesh;
+	var target = new THREE.Vector3();
+
+	var lon = 90, lat = 0;
+	var phi = 0, theta = 0;
+
+	var touchX, touchY;
+	var moveThis=0;
+	var moveLeftf=0;
+	var moveRightf=0;
+	var zoominf=0;
+	var zoomoutf=0;
+	init();
+	animate();
+
+	function init() {
+
+		camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+
+		scene = new THREE.Scene();
+
+		var sides = [
+			{
+				url: 'img/clg/lib/posx.jpg',
+				position: [ -512, 0, 0 ],
+				rotation: [ 0, Math.PI / 2, 0 ]
+			},
+			{
+				url: 'img/clg/lib/negx.jpg',
+				position: [ 512, 0, 0 ],
+				rotation: [ 0, -Math.PI / 2, 0 ]
+			},
+			{
+				url: 'img/clg/lib/posy.jpg',
+				position: [ 0,  512, 0 ],
+				rotation: [ Math.PI / 2, 0, Math.PI ]
+			},
+			{
+				url: 'img/clg/lib/negy.jpg',
+				position: [ 0, -512, 0 ],
+				rotation: [ - Math.PI / 2, 0, Math.PI ]
+			},
+			{
+				url: 'img/clg/lib/posz.jpg',
+				position: [ 0, 0,  512 ],
+				rotation: [ 0, Math.PI, 0 ]
+			},
+			{
+				url: 'img/clg/lib/negz.jpg',
+				position: [ 0, 0, -512 ],
+				rotation: [ 0, 0, 0 ]
+			}
+		];
+
+		for ( var i = 0; i < sides.length; i ++ ) {
+
+			var side = sides[ i ];
+
+			var element = document.createElement( 'img' );
+			element.width = 1026; // 2 pixels extra to close the gap.
+			element.src = side.url;
+
+			var object = new THREE.CSS3DObject( element );
+			object.position.fromArray( side.position );
+			object.rotation.fromArray( side.rotation );
+			scene.add( object );
+
+		}
+
+
+		renderer = new THREE.CSS3DRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		//
+
+		document.addEventListener( 'mousedown', onDocumentMouseDown, true );
+		document.addEventListener( 'mousewheel', onDocumentMouseWheel, true );
+
+		document.addEventListener( 'touchstart', onDocumentTouchStart, true );
+		document.addEventListener( 'touchmove', onDocumentTouchMove, true );
+
+		window.addEventListener( 'resize', onWindowResize, true );
+
+	}
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+
+	}
+
+	function onDocumentMouseDown( event ) {
+
+		event.preventDefault();
+		moveThis=1;
+		document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+		document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+
+	}
+
+	function onDocumentMouseMove( event ) {
+
+		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+		lon -= movementX * 0.1;
+		lat += movementY * 0.1;
+
+	}
+
+	function onDocumentMouseUp( event ) {
+		moveThis=0;
+		document.removeEventListener( 'mousemove', onDocumentMouseMove );
+		document.removeEventListener( 'mouseup', onDocumentMouseUp );
+
+	}
+
+	function onDocumentMouseWheel( event ) {
+
+		camera.fov -= event.wheelDeltaY * 0.05;
+		camera.updateProjectionMatrix();
+
+	}
+
+	function onDocumentTouchStart( event ) {
+
+		event.preventDefault();
+
+		var touch = event.touches[ 0 ];
+
+		touchX = touch.screenX;
+		touchY = touch.screenY;
+
+	}
+
+	function onDocumentTouchMove( event ) {
+
+		event.preventDefault();
+
+		var touch = event.touches[ 0 ];
+
+		lon -= ( touch.screenX - touchX ) * 0.1;
+		lat += ( touch.screenY - touchY ) * 0.1;
+
+		touchX = touch.screenX;
+		touchY = touch.screenY;
+
+	}
+
+	function animate() {
+
+		requestAnimationFrame( animate );
+
+		lon +=  0.1;
+		lat = Math.max( - 85, Math.min( 85, lat ) );
+		phi = THREE.Math.degToRad( 90 - lat );
+		theta = THREE.Math.degToRad( lon );
+		if(moveThis){
+			target.x = Math.sin( phi ) * Math.cos( theta );
+			target.y = Math.cos( phi );
+			target.z = Math.sin( phi ) * Math.sin( theta );
+		}
+		if(moveLeftf){
+			target.x = Math.sin( -phi ) * Math.cos( theta );
+
+		}
+		if(moveRightf){
+			target.x = Math.sin( phi ) * Math.cos( theta );
+			target.y = Math.cos( phi );
+			target.z = Math.sin( phi ) * Math.sin( theta );
+		}
+		if(zoominf){
+			camera.fov -= 10 ;
+			camera.updateProjectionMatrix();
+			zoominf=0;
+		}
+		if(zoomoutf){
+			camera.fov += 10 ;
+			camera.updateProjectionMatrix();
+			zoomoutf=0;
+		}
+		camera.lookAt( target );
+
+		renderer.render( scene, camera );
+
+	}
+	function moveLeft() {
+		moveLeftf=1;
+		moveRightf=0;
+	}
+	function moveRight() {
+		moveRightf=1;
+		moveLeftf=0;
+	}
+	function zoomIn() {
+		zoominf=1;
+	}
+	function zoomOut() {
+		zoomoutf=1;
+	}
+	</script>
+
+</body>
+<script type="text/javascript" src="js/jquery.js" ></script>
+<script type="text/javascript" src="js/bootstrap.min.js" ></script>
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover({html:true});
+});
+</script>
+</html>
